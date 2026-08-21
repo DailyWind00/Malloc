@@ -1,12 +1,5 @@
 #include "ft_malloc.h"
 
-// Round the given size to the nearest alignment multiple greater than size to avoid misalignment.
-static size_t	align_size(size_t size, size_t alignment) {
-	return (size + alignment - 1) & ~(alignment - 1);
-}
-
-
-
 void	free(void *ptr)
 {
 	if (!ptr)	return;
