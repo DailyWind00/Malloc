@@ -1,10 +1,29 @@
 #include "ft_malloc.h"
 
+// Check if the malloc context have been initialized with init_malloc().
+bool	is_malloc_init() {
+	return g_zones;
+}
+
 // Round the given size to the nearest alignment multiple greater than size to avoid misalignment.
 size_t	align_size(size_t size, size_t alignment) {
 	return (size + alignment - 1) & ~(alignment - 1);
 }
 
+
+void	*ft_memcpy(void *dest, const void *src, size_t size)
+{
+	if (dest == NULL || src == NULL) return (NULL);
+
+	size_t		i = 0;
+
+	while (i < size) {
+		((char *)dest)[i] = ((const char *)src)[i];
+		i++;
+	}
+
+	return (dest);
+}
 
 
 // Check if two chunks are adjacent in memory
@@ -21,14 +40,15 @@ void	coalesce_chunk(Chunk *chunk)
 	Chunk *first = chunk;
 	Chunk *last = chunk;
 
-    while (first->prev && first->prev->is_free && are_chunks_adjacent(first->prev, first))
+    while (first->prev && first->prev->is_free && are_chunks_adjacent(first->prev, first)) {
         first = first->prev;
+	}
 
-    while (last->next && last->next->is_free && are_chunks_adjacent(last, last->next))
+    while (last->next && last->next->is_free && are_chunks_adjacent(last, last->next)) {
         last = last->next;
+	}
 
-	if (first == last)
-        return;
+	if (first == last) return;
 
 	size_t total_size = 0;
 	Chunk *current = first;
