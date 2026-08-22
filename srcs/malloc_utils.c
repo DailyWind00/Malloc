@@ -5,6 +5,25 @@ bool	is_malloc_init() {
 	return g_zones;
 }
 
+// Check if the malloc context can be safely destroyed with exit_malloc().
+bool	can_malloc_exit() {
+	if (!is_malloc_init()) return false;
+
+	bool can_exit = true;
+
+	while (can_exit && g_zones->tiny) {
+		can_exit = g_zones->tiny->is_free;
+		g_zones->tiny = g_zones->tiny->next;
+	}
+	
+	while (can_exit && g_zones->small) {
+		can_exit = g_zones->small->is_free;
+		g_zones->small = g_zones->small->next;
+	}
+	
+	return can_exit;
+}
+
 // Round the given size to the nearest alignment multiple greater than size to avoid misalignment.
 size_t	align_size(size_t size, size_t alignment) {
 	return (size + alignment - 1) & ~(alignment - 1);

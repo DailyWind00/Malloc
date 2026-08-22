@@ -31,7 +31,7 @@ extern pthread_mutex_t g_malloc_mutex;
 
 // init.c
 int		init_malloc();
-int		exit_malloc();
+void	exit_malloc();
 
 // malloc.c
 void	*malloc(size_t size);
@@ -42,6 +42,7 @@ void	free(void *ptr);
 
 // malloc_utils.c
 bool	is_malloc_init();
+bool	can_malloc_exit();
 size_t	align_size(size_t size, size_t alignment);
 void	*ft_memcpy(void *dest, const void *src, size_t size);
 void	coalesce_chunk(Chunk *chunk);

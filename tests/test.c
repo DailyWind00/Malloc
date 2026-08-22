@@ -162,6 +162,9 @@ static int check_malloc_library(void)
         return 0;
     }
 
+	printf(GREEN "> libft_malloc detected.\n" RESET
+		"Current malloc: %s\n\n", info.dli_fname);
+
     return 1;
 }
 
@@ -169,7 +172,6 @@ int main(void)
 {
 	if (!check_malloc_library())
 		return 1;
-	printf(GREEN "> libft_malloc detected.\n\n" RESET);
 
     int failures = 0;
 
@@ -180,10 +182,11 @@ int main(void)
 
     printf("\n============================\n");
 
-    if (failures == 0)
+    if (failures == 0) {
         printf("ALL TESTS PASSED\n");
-    else
-        printf("%d TEST(S) FAILED\n", failures);
+	} else {
+		printf("%d TEST(S) FAILED\n", failures);
+	}
 
     return failures != 0;
 }

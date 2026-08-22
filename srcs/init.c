@@ -23,7 +23,13 @@ static Chunk *get_zone(size_t zsize)
 // Create the malloc context to allow the use of the malloc/realloc/free functions.
 int	init_malloc()
 {
+	if (is_malloc_init()) return 0;
+
 	size_t psize = sysconf(_SC_PAGE_SIZE);
+
+	g_zones = mmap(NULL, sizeof(Zone), PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON, -1, 0);
+	if (g_zones == MAP_FAILED)
+		return -1;
 
 	g_zones->tiny = get_zone(psize * TINY_MAX_SIZE);
 	g_zones->small = get_zone(psize * SMALL_MAX_SIZE);
@@ -37,8 +43,13 @@ int	init_malloc()
 
 
 // Destroy the malloc context, which block the use of the malloc/realloc/free functions.
-int	exit_malloc()
+void	exit_malloc()
 {
+	if (!can_malloc_exit()) return;
 
-	return 0;
+	if (g_zones->tiny)	munmap(g_zones->tiny,  g_zones->tiny->size  + sizeof(Chunk));
+	if (g_zones->small)	munmap(g_zones->small, g_zones->small->size + sizeof(Chunk));
+	if (g_zones->large)	munmap(g_zones->large, g_zones->large->size + sizeof(Chunk));
+
+	munmap(g_zones, sizeof(Zone));
 }
