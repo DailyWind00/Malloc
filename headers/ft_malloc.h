@@ -9,6 +9,7 @@
 
 # define TINY_MAX_SIZE 516
 # define SMALL_MAX_SIZE 4096
+# define ALIGNMENT 8
 
 typedef struct Chunk {
 	size_t	size;
@@ -29,10 +30,6 @@ extern pthread_mutex_t g_malloc_mutex;
 
 // --- External functions :
 
-// init.c
-int		init_malloc();
-void	exit_malloc();
-
 // malloc.c
 void	*malloc(size_t size);
 void	*realloc(void *ptr, size_t size);
@@ -40,9 +37,13 @@ void	free(void *ptr);
 
 // --- Internal functions :
 
-// malloc_utils.c
+// init.c
 bool	is_malloc_init();
 bool	can_malloc_exit();
+void	init_malloc();
+void	exit_malloc();
+
+// malloc_utils.c
 size_t	align_size(size_t size, size_t alignment);
 void	*ft_memcpy(void *dest, const void *src, size_t size);
 void	coalesce_chunk(Chunk *chunk);

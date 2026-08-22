@@ -16,8 +16,6 @@ void	free(void *ptr)
 	chunk->is_free = true;
 	coalesce_chunk(chunk);
 
-	// If zone is empty, mummap
-
 	exit_malloc();
 	pthread_mutex_unlock(&g_malloc_mutex);
 }
