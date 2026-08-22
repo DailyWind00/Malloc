@@ -1,2 +1,2 @@
-# malloc
+# Malloc
 42 malloc project
