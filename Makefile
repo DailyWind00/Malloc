@@ -7,25 +7,26 @@ LINK = libft_malloc.so
 SRCS =	$(wildcard ./srcs/*.c)
 OBJS = $(SRCS:.c=.o)
 HEADERS = ./headers/
+CFLAGS = -Wall -Wextra -g -fPIC
 
-TEST_NAME = test_malloc.out
+TEST_NAME = test_malloc
 TEST_SRCS = $(wildcard ./tests/*.c)
 TEST_OBJS = $(TEST_SRCS:.c=.o)
+TEST_FLAGS = -Wall -Wextra -g
 
 CC = gcc
-CFLAGS = -Wall -Wextra -g -fPIC
 RM = rm -f
 
 all: $(NAME) $(LINK) $(TEST_NAME)
 
 $(NAME): $(OBJS)
-	$(CC) $(CFLAGS) $(OBJS) -shared -o $(NAME) -I "$(HEADERS)"
+	$(CC) $(CFLAGS) $(OBJS) -shared -o $(NAME)
 
 $(LINK): $(NAME)
 	ln -sf $(NAME) $(LINK)
 
 $(TEST_NAME): $(TEST_OBJS)
-	$(CC) $(CFLAGS) $(TEST_OBJS) -o $(TEST_NAME)
+	$(CC) $(CFLAGS_TEST) $(TEST_OBJS) -o $(TEST_NAME)
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@ -I "$(HEADERS)"

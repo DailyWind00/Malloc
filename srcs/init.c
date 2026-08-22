@@ -40,5 +40,5 @@ int	init_malloc()
 int	exit_malloc()
 {
 
-
+	return 0;
 }

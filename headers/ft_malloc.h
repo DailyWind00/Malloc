@@ -41,6 +41,7 @@ void	free(void *ptr);
 // --- Internal functions :
 
 // malloc_utils.c
+bool	is_malloc_init();
 size_t	align_size(size_t size, size_t alignment);
 void	*ft_memcpy(void *dest, const void *src, size_t size);
 void	coalesce_chunk(Chunk *chunk);
