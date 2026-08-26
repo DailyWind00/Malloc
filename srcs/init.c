@@ -76,6 +76,7 @@ void	init_malloc()
 	}
 
 	g_zones->large = NULL;
+	g_zones->page_size = psize;
 }
 
 

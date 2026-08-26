@@ -7,6 +7,7 @@
 # include <pthread.h>
 # include <unistd.h>
 
+# define MIN_ALLOC_SIZE sizeof(char)
 # define TINY_MAX_SIZE 516
 # define SMALL_MAX_SIZE 4096
 # define ALIGNMENT 8
@@ -23,6 +24,8 @@ typedef struct Zone {
 	Chunk	*tiny;
 	Chunk	*small;
 	Chunk	*large;
+
+	size_t	page_size;
 } Zone;
 
 extern Zone	*g_zones;
@@ -44,6 +47,6 @@ void	init_malloc();
 void	exit_malloc();
 
 // malloc_utils.c
-size_t	align_size(size_t size, size_t alignment);
+size_t	align_size(size_t size);
 void	*ft_memcpy(void *dest, const void *src, size_t size);
 void	coalesce_chunk(Chunk *chunk);

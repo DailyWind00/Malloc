@@ -1,16 +1,15 @@
 #include "ft_malloc.h"
 
 // Round the given size to the nearest alignment multiple greater than size to avoid misalignment.
-size_t	align_size(size_t size, size_t alignment) {
-	return (size + alignment - 1) & ~(alignment - 1);
+size_t	align_size(size_t size) {
+	return (size + ALIGNMENT - 1) & ~(ALIGNMENT - 1);
 }
-
 
 void	*ft_memcpy(void *dest, const void *src, size_t size)
 {
 	if (dest == NULL || src == NULL) return (NULL);
 
-	size_t		i = 0;
+	size_t i = 0;
 
 	while (i < size) {
 		((char *)dest)[i] = ((const char *)src)[i];
@@ -19,6 +18,7 @@ void	*ft_memcpy(void *dest, const void *src, size_t size)
 
 	return (dest);
 }
+
 
 
 // Check if two chunks are adjacent in memory
@@ -38,11 +38,9 @@ void	coalesce_chunk(Chunk *chunk)
     while (first->prev && first->prev->is_free && are_chunks_adjacent(first->prev, first)) {
         first = first->prev;
 	}
-
     while (last->next && last->next->is_free && are_chunks_adjacent(last, last->next)) {
         last = last->next;
 	}
-
 	if (first == last) return;
 
 	size_t total_size = 0;
