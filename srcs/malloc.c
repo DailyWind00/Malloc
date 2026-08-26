@@ -71,7 +71,7 @@ void	*malloc(size_t size)
 
 	size_t asize = align_size(size);
 
-	if (size > MAX_ALLOWED_SIZE || asize > MAX_ALLOWED_SIZE) {
+	if (asize == 0 || asize > MAX_ALLOWED_SIZE || asize < size) {
 		pthread_mutex_unlock(&g_malloc_mutex);
 		return NULL;
 	}
