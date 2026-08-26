@@ -19,18 +19,23 @@ void	free(void *ptr)
 	chunk->is_free = true;
 	coalesce_chunk(chunk);
 
-	// Clean large zone
-	while (g_zones->large) {
-		Chunk *cur_chunk = g_zones->large;
-		g_zones->large = g_zones->large->next;
+	Chunk *large = g_zones->large;
 
-		if (!cur_chunk->is_free)
-			continue;
+	while (large) {
+		if (large == chunk) {
+			if (chunk->prev)
+				chunk->prev->next = chunk->next;
+			else
+				g_zones->large = chunk->next;
 
-		if (g_zones->large)
-			g_zones->large->prev = NULL;
+			if (chunk->next)
+				chunk->next->prev = chunk->prev;
 
-		munmap(cur_chunk, cur_chunk->size + sizeof(Chunk));
+			munmap(chunk, sizeof(Chunk) + chunk->size);
+			break;
+		}
+
+		large = large->next;
 	}
 
 	exit_malloc();

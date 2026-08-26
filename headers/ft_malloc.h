@@ -9,8 +9,8 @@
 # include <stdint.h>
 
 # define MIN_ALLOC_SIZE sizeof(char)
-# define TINY_MAX_SIZE 4
-# define SMALL_MAX_SIZE 32
+# define TINY_MAX_SIZE 1
+# define SMALL_MAX_SIZE 4
 # define ALIGNMENT 8
 # define MAX_ALLOWED_SIZE SIZE_MAX - sizeof(Chunk)
 

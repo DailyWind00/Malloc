@@ -1,6 +1,5 @@
 #include "ft_malloc.h"
 
-#include <stdio.h>
 #include <stdint.h>
 #include <string.h>
 #include <unistd.h>
@@ -8,21 +7,66 @@
 static int g_tests = 0;
 static int g_failed = 0;
 
-static void test_start(const char *name)
+static void	print_str(const char *str)
 {
-    printf("\n[TEST] %s\n", name);
-    g_tests++;
+	size_t len = 0;
+
+	if (!str)
+		return;
+
+	while (str[len])
+		len++;
+
+	write(STDOUT_FILENO, str, len);
 }
 
-static void test_fail(const char *msg)
+static void	print_nbr(int n)
 {
-    printf("  FAIL: %s\n", msg);
-    g_failed++;
+	char	buffer[12];
+	int		i;
+	long	nb;
+
+	i = 0;
+	nb = n;
+
+	if (nb == 0) {
+		write(STDOUT_FILENO, "0", 1);
+		return;
+	}
+
+	if (nb < 0) {
+		write(STDOUT_FILENO, "-", 1);
+		nb = -nb;
+	}
+
+	while (nb > 0) {
+		buffer[i++] = '0' + (nb % 10);
+		nb /= 10;
+	}
+
+	while (i > 0)
+		write(STDOUT_FILENO, &buffer[--i], 1);
 }
 
-static void test_pass(void)
+static void	test_start(const char *name)
 {
-    printf("  PASS\n");
+	print_str("\n[TEST] ");
+	print_str(name);
+	print_str("\n");
+	g_tests++;
+}
+
+static void	test_fail(const char *msg)
+{
+	print_str("  FAIL: ");
+	print_str(msg);
+	print_str("\n");
+	g_failed++;
+}
+
+static void	test_pass(void)
+{
+	print_str("  PASS\n");
 }
 
 static int is_aligned(void *ptr)
@@ -178,7 +222,7 @@ static void test_size_classes(void)
 	size_t psize = sysconf(_SC_PAGE_SIZE);
 
     void *tiny = malloc(32 * psize);
-    void *small = malloc(1024);
+    void *small = malloc(1024 * 4);
     void *large = malloc(1024 * 1024);
 
     if (!tiny || !small || !large)
@@ -234,9 +278,7 @@ static void test_reuse_freed_block(void)
      * reuse the freed chunk.
      */
     if (b != a)
-    {
-        printf("  WARNING: allocator did not reuse the same address\n");
-    }
+		print_str("  WARNING: allocator did not reuse the same address\n");
 
     free(b);
     test_pass();
@@ -554,7 +596,7 @@ static void test_show_alloc_mem(void)
 
     void *a = malloc(42);
     void *b = malloc(84);
-    void *c = malloc(3725);
+    void *c = malloc(5725);
 	void *d = malloc(48847);
 
     if (!a || !b || !c || !d)
@@ -631,42 +673,45 @@ static void test_stress(void)
  * ------------------------------------------------------------
  */
 
-int main(void)
+int	main(void)
 {
-    printf("========================================\n");
-    printf("        ft_malloc test suite\n");
-    printf("========================================\n");
+	print_str("========================================\n");
+	print_str("        ft_malloc test suite\n");
+	print_str("========================================\n");
 
-    test_malloc_basic();
-    test_malloc_multiple();
-    test_malloc_zero();
-    test_malloc_alignment();
+	test_malloc_basic();
+	test_malloc_multiple();
+	test_malloc_zero();
+	test_malloc_alignment();
 
-    test_size_classes();
+	test_size_classes();
 
-    test_reuse_freed_block();
-    test_split();
-    test_coalescing();
+	test_reuse_freed_block();
+	test_split();
+	test_coalescing();
 
-    test_free_null();
-    test_free_multiple();
+	test_free_null();
+	test_free_multiple();
 
-    test_realloc_grow();
-    test_realloc_shrink();
-    test_realloc_same_size();
-    test_realloc_null();
+	test_realloc_grow();
+	test_realloc_shrink();
+	test_realloc_same_size();
+	test_realloc_null();
 
-    test_huge_allocation();
-    test_realloc_huge();
+	test_huge_allocation();
+	test_realloc_huge();
 
-    test_show_alloc_mem();
+	test_show_alloc_mem();
 
-    test_stress();
+	test_stress();
 
-    printf("\n========================================\n");
-    printf("Tests:  %d\n", g_tests);
-    printf("Failed: %d\n", g_failed);
-    printf("========================================\n");
+	print_str("\n========================================\n");
+	print_str("Tests:  ");
+	print_nbr(g_tests);
+	print_str("\nFailed: ");
+	print_nbr(g_failed);
+	print_str("\n");
+	print_str("========================================\n");
 
-    return g_failed != 0;
+	return g_failed != 0;
 }
