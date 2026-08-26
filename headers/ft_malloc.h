@@ -52,3 +52,6 @@ void	exit_malloc();
 size_t	align_size(size_t size);
 void	*ft_memcpy(void *dest, const void *src, size_t size);
 void	coalesce_chunk(Chunk *chunk);
+
+// print_memory.c
+void	show_alloc_mem();
