@@ -26,6 +26,25 @@ static void print_hex(size_t num)
 		write(1, &buffer[i], 1);
 }
 
+static void print_nbr(size_t num)
+{
+	char buffer[21];
+	int i = 0;
+
+	if (num == 0) {
+		write(1, "0", 1);
+		return;
+	}
+
+	while (num > 0) {
+		buffer[i++] = '0' + (num % 10);
+		num /= 10;
+	}
+
+	while (--i >= 0)
+		write(1, &buffer[i], 1);
+}
+
 static size_t print_zone(const char *zone_name, Chunk *zone)
 {
 	print_str(zone_name);
@@ -40,7 +59,7 @@ static size_t print_zone(const char *zone_name, Chunk *zone)
 		print_str(" - ");
 		print_hex((size_t)((char *)chunk + sizeof(Chunk) + chunk->size));
 		print_str(" : ");	
-		print_hex(chunk->size);
+		print_nbr(chunk->size);
 		print_str(" bytes\n");
 
 		total_size += chunk->size + sizeof(Chunk);
@@ -65,7 +84,7 @@ void	show_alloc_mem()
 	total_size += print_zone("LARGE : ", g_zones->large);
 
 	print_str("Total : ");
-	print_hex(total_size);
+	print_nbr(total_size);
 	print_str(" bytes\n");
 
 	pthread_mutex_unlock(&g_malloc_mutex);
