@@ -54,6 +54,11 @@ static size_t print_zone(const char *zone_name, Chunk *zone)
 	Chunk *chunk = zone;
 	size_t total_size = 0;
 
+	if (!chunk) {
+		print_str("  No allocations in this zone.\n");
+		return 0;
+	}
+
     while (chunk)
     {
         if (chunk->is_free)

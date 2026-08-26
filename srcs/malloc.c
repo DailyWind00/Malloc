@@ -19,6 +19,20 @@ void	free(void *ptr)
 	chunk->is_free = true;
 	coalesce_chunk(chunk);
 
+	// Clean large zone
+	while (g_zones->large) {
+		Chunk *cur_chunk = g_zones->large;
+		g_zones->large = g_zones->large->next;
+
+		if (!cur_chunk->is_free)
+			continue;
+
+		if (g_zones->large)
+			g_zones->large->prev = NULL;
+
+		munmap(cur_chunk, cur_chunk->size + sizeof(Chunk));
+	}
+
 	exit_malloc();
 	pthread_mutex_unlock(&g_malloc_mutex);
 }
