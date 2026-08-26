@@ -4,7 +4,10 @@ void	free(void *ptr)
 {
 	pthread_mutex_lock(&g_malloc_mutex);
 
-	if (!is_malloc_init() || !ptr) return;
+	if (!is_malloc_init() || !ptr) {
+		pthread_mutex_unlock(&g_malloc_mutex);
+		return;
+	}
 	
 	Chunk *chunk = (Chunk *)((char *)ptr - sizeof(Chunk));
 
@@ -137,8 +140,14 @@ void	*realloc(void *ptr, size_t size)
 	pthread_mutex_lock(&g_malloc_mutex);
 	init_malloc();
 
-	if (!is_malloc_init() || size == 0) return NULL;
-	if (!ptr) return malloc(size);
+	if (!is_malloc_init() || size == 0) {
+		pthread_mutex_unlock(&g_malloc_mutex);
+		return NULL;
+	}
+	if (!ptr) {
+		pthread_mutex_unlock(&g_malloc_mutex);
+		return malloc(size);
+	}
 
 	// If size <= current size : shrink block
 	// Else if there is enough place after block : expand block

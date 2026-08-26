@@ -6,12 +6,13 @@
 # include <stdbool.h>
 # include <pthread.h>
 # include <unistd.h>
+# include <stdint.h>
 
 # define MIN_ALLOC_SIZE sizeof(char)
 # define TINY_MAX_SIZE 516
 # define SMALL_MAX_SIZE 4096
 # define ALIGNMENT 8
-# define MAX_ALLOWED_SIZE __SIZE_MAX__ - sizeof(Chunk)
+# define MAX_ALLOWED_SIZE SIZE_MAX - sizeof(Chunk)
 
 typedef struct Chunk {
 	size_t	size;

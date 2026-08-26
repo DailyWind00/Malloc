@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <dlfcn.h>
+#include <unistd.h>
 
 #define GREEN "\033[32m"
 #define RED "\033[31m"
@@ -13,26 +14,46 @@ static int test_malloc(void)
 {
     printf("=== malloc ===\n");
 
-    char *ptr = malloc(32);
+	long psize = sysconf(_SC_PAGE_SIZE);
 
-    if (ptr == NULL)
+    char *tiny = malloc(32 * psize);
+
+    if (tiny == NULL)
     {
-        printf("[FAIL] malloc returned NULL\n");
+        printf("[FAIL] tiny malloc returned NULL\n");
         return 1;
     }
 
-    strcpy(ptr, "Hello malloc!");
+    strcpy(tiny, "Hello malloc!");
 
-    if (strcmp(ptr, "Hello malloc!") != 0)
+    if (strcmp(tiny, "Hello malloc!") != 0)
     {
         printf("[FAIL] memory cannot be written/read\n");
-        free(ptr);
+        free(tiny);
         return 1;
     }
+    printf("[OK] tiny malloc: %p -> \"%s\"\n", (void *)tiny, tiny);
 
-    printf("[OK] malloc: %p -> \"%s\"\n", (void *)ptr, ptr);
+	char *small = malloc(700 * psize);
+	char *large = malloc(5000 * psize);
 
-    free(ptr);
+	if (small == NULL)
+	{
+		printf("[FAIL] small malloc returned NULL\n");
+		return 1;
+	}
+	printf("[OK] small malloc: %p\n", (void *)small);
+
+	if (large == NULL)
+	{
+		printf("[FAIL] large malloc returned NULL\n");
+		return 1;
+	}
+	printf("[OK] large malloc: %p\n", (void *)large);
+
+    free(tiny);
+	free(small);
+	free(large);
 
     printf("[OK] free\n");
 
