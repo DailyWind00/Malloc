@@ -144,16 +144,40 @@ void	*realloc(void *ptr, size_t size)
 		pthread_mutex_unlock(&g_malloc_mutex);
 		return NULL;
 	}
+	
+	size_t asize = align_size(size);
+
+	if (asize == 0 || asize > MAX_ALLOWED_SIZE || asize < size) {
+		pthread_mutex_unlock(&g_malloc_mutex);
+		return NULL;
+	}
+	size = asize;
+
 	if (!ptr) {
 		pthread_mutex_unlock(&g_malloc_mutex);
 		return malloc(size);
 	}
 
-	// If size <= current size : shrink block
-	// Else if there is enough place after block : expand block
-	// Else : malloc > memcpy > free block
+	Chunk *chunk = (Chunk *)((char *)ptr - sizeof(Chunk));
 
+	if (size == chunk->size) {
+		pthread_mutex_unlock(&g_malloc_mutex);
+		return ptr;
+	}
+	if (size < chunk->size) {
+		try_split_chunk(chunk, size);
+		pthread_mutex_unlock(&g_malloc_mutex);
+		return ptr;
+	}
 	pthread_mutex_unlock(&g_malloc_mutex);
 
-	return NULL;
+	void *new_ptr = malloc(size);
+	if (!new_ptr) return NULL;
+
+	pthread_mutex_lock(&g_malloc_mutex);
+	new_ptr = ft_memcpy(new_ptr, ptr, chunk->size);
+	pthread_mutex_unlock(&g_malloc_mutex);
+
+	free(ptr);
+	return new_ptr;
 }

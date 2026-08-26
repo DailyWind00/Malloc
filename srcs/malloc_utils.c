@@ -2,9 +2,9 @@
 
 // Round the given size to the nearest alignment multiple greater than size to avoid misalignment.
 size_t	align_size(size_t size) {
-    if (size > SIZE_MAX - (ALIGNMENT - 1))
-        return 0;
-
+    if (size > SIZE_MAX - (ALIGNMENT - 1)) {
+		return 0;
+	}
 	return (size + ALIGNMENT - 1) & ~(ALIGNMENT - 1);
 }
 
