@@ -12,19 +12,30 @@ bool	is_malloc_init() {
 bool	can_malloc_exit() {
 	if (!is_malloc_init()) return false;
 
-	bool can_exit = true;
+    Chunk *chunk;
 
-	while (can_exit && g_zones->tiny) {
-		can_exit = g_zones->tiny->is_free;
-		g_zones->tiny = g_zones->tiny->next;
-	}
-	
-	while (can_exit && g_zones->small) {
-		can_exit = g_zones->small->is_free;
-		g_zones->small = g_zones->small->next;
-	}
-	
-	return can_exit;
+    chunk = g_zones->tiny;
+    while (chunk) {
+        if (!chunk->is_free)
+            return false;
+        chunk = chunk->next;
+    }
+
+    chunk = g_zones->small;
+    while (chunk) {
+        if (!chunk->is_free)
+            return false;
+        chunk = chunk->next;
+    }
+
+    chunk = g_zones->large;
+    while (chunk) {
+        if (!chunk->is_free)
+            return false;
+        chunk = chunk->next;
+    }
+
+    return true;
 }
 
 

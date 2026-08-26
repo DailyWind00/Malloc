@@ -54,26 +54,44 @@ static size_t print_zone(const char *zone_name, Chunk *zone)
 	Chunk *chunk = zone;
 	size_t total_size = 0;
 
-	while (chunk) {
-		print_hex((size_t)chunk);
-		print_str(" - ");
-		print_hex((size_t)((char *)chunk + sizeof(Chunk) + chunk->size));
-		print_str(" : ");	
-		print_nbr(chunk->size);
-		print_str(" bytes\n");
+    while (chunk)
+    {
+        if (chunk->is_free)
+        {
+            print_str("  [FREE]      ");
+            print_nbr(chunk->size);
+            print_str(" free bytes\n");
+        }
+        else
+        {
+            print_str("  [ALLOCATED] ");
 
-		total_size += chunk->size + sizeof(Chunk);
-		chunk = chunk->next;
-	}
-	return total_size;
+            print_hex((size_t)((char *)chunk + sizeof(Chunk)));
+            print_str(" - ");
+            print_hex((size_t)((char *)chunk + sizeof(Chunk) + chunk->size));
+            print_str(" : ");
+
+            print_nbr(chunk->size);
+            print_str(" bytes\n");
+
+            total_size += chunk->size;
+        }
+
+        chunk = chunk->next;
+    }
+
+    return total_size;
 }
 
 void	show_alloc_mem()
 {
 	pthread_mutex_lock(&g_malloc_mutex);
 
+	print_str("=== Memory Allocations ===\n");
+
 	if (!g_zones) {
 		print_str("Malloc not initialized.\n");
+		print_str("==========================\n");
 		pthread_mutex_unlock(&g_malloc_mutex);
 		return;
 	}
@@ -86,6 +104,8 @@ void	show_alloc_mem()
 	print_str("Total : ");
 	print_nbr(total_size);
 	print_str(" bytes\n");
+
+	print_str("==========================\n");
 
 	pthread_mutex_unlock(&g_malloc_mutex);
 }
