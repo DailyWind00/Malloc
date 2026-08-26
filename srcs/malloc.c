@@ -48,7 +48,6 @@ static void try_split_chunk(Chunk *chunk, size_t wanted_size)
 
 	new_chunk->size = total_size - wanted_size - sizeof(Chunk);
 	new_chunk->is_free = true;
-
 	new_chunk->next = chunk->next;
 	new_chunk->prev = chunk;
 
@@ -67,14 +66,16 @@ void	*malloc(size_t size)
 		return NULL;
 	}
 
-	size = align_size(size);
+	size_t asize = align_size(size);
 
-	// Search for freed block
-	// If no : Search in another zone
-	// If yes : try to split it and use it
+	if (size > MAX_ALLOWED_SIZE || asize > MAX_ALLOWED_SIZE) {
+		pthread_mutex_unlock(&g_malloc_mutex);
+		return NULL;
+	}
+	size = asize;
 
 	// Tiny allocation
-	if (size < (g_zones->page_size * TINY_MAX_SIZE) - sizeof(Chunk)) {
+	if (size <= (g_zones->page_size * TINY_MAX_SIZE) - sizeof(Chunk)) {
 		Chunk *chunk = find_free_block(g_zones->tiny, size);
 
 		if (chunk) {
@@ -88,7 +89,7 @@ void	*malloc(size_t size)
 		}
 	}
 	// Small allocation
-	if (size < (g_zones->page_size * SMALL_MAX_SIZE) - sizeof(Chunk)) {
+	if (size <= (g_zones->page_size * SMALL_MAX_SIZE) - sizeof(Chunk)) {
 		Chunk *chunk = find_free_block(g_zones->small, size);
 
 		if (chunk) {
@@ -102,6 +103,28 @@ void	*malloc(size_t size)
 		}
 	}
 	// Large allocation
+	void *map = mmap(NULL, size + sizeof(Chunk), PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+	if (map != MAP_FAILED) {
+		Chunk *last_large = g_zones->large;
+		while (last_large && last_large->next) { last_large = last_large->next; }
+
+		Chunk *chunk = map;
+
+		chunk->size = size;
+		chunk->is_free = false;
+		chunk->next = NULL;
+		chunk->prev = last_large;
+
+		if (last_large)
+			last_large->next = chunk;
+		else
+			g_zones->large = chunk;
+
+		void *ptr = (char *)map + sizeof(Chunk);
+
+		pthread_mutex_unlock(&g_malloc_mutex);
+		return ptr;
+	}
 
 	pthread_mutex_unlock(&g_malloc_mutex);
 	return NULL;

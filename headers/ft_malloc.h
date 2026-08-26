@@ -11,6 +11,7 @@
 # define TINY_MAX_SIZE 516
 # define SMALL_MAX_SIZE 4096
 # define ALIGNMENT 8
+# define MAX_ALLOWED_SIZE __SIZE_MAX__ - sizeof(Chunk)
 
 typedef struct Chunk {
 	size_t	size;
