@@ -55,6 +55,7 @@ void	show_alloc_mem()
 
 	if (!g_zones) {
 		print_str("Malloc not initialized.\n");
+		pthread_mutex_unlock(&g_malloc_mutex);
 		return;
 	}
 	size_t total_size = 0;

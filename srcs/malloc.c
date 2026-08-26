@@ -144,7 +144,7 @@ void	*realloc(void *ptr, size_t size)
 		pthread_mutex_unlock(&g_malloc_mutex);
 		return NULL;
 	}
-	
+
 	size_t asize = align_size(size);
 
 	if (asize == 0 || asize > MAX_ALLOWED_SIZE || asize < size) {

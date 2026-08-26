@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include <dlfcn.h>
 #include <unistd.h>
+#include "ft_malloc.h"
 
 #define GREEN "\033[32m"
 #define RED "\033[31m"
@@ -153,47 +154,8 @@ static int test_null(void)
     return 0;
 }
 
-static int check_malloc_library(void)
-{
-    Dl_info info;
-
-    if (dladdr((void *)malloc, &info) == 0)
-    {
-        fprintf(stderr, "Could not determine malloc implementation.\n");
-        return 0;
-    }
-
-    if (info.dli_fname == NULL)
-    {
-        fprintf(stderr, "Could not determine malloc library.\n");
-        return 0;
-    }
-
-    if (strstr(info.dli_fname, "libft_malloc") == NULL)
-    {
-        fprintf(stderr,
-            RED "Error: your libft_malloc is not loaded.\n" RESET
-            "Run: "
-			GREEN "LD_PRELOAD=./libft_malloc.so ./test_malloc" RESET "\n");
-
-        fprintf(stderr,
-            "Current malloc: %s\n",
-            info.dli_fname);
-
-        return 0;
-    }
-
-	printf(GREEN "> libft_malloc detected.\n" RESET
-		"Current malloc: %s\n\n", info.dli_fname);
-
-    return 1;
-}
-
 int main(void)
 {
-	if (!check_malloc_library())
-		return 1;
-
     int failures = 0;
 
     failures += test_malloc();
