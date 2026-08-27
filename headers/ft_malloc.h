@@ -14,6 +14,7 @@
 # define SMALL_MAX_SIZE 4
 # define ALIGNMENT 8
 # define MAX_ALLOWED_SIZE SIZE_MAX - sizeof(Chunk)
+# define HEX_DUMP_MAX 256
 
 typedef struct Chunk {
 	size_t	size;
@@ -60,3 +61,4 @@ void	print_str(const char *str);
 void	print_hex(size_t num);
 void 	print_nbr(size_t num);
 void	show_alloc_mem();
+void	show_alloc_mem_ex();

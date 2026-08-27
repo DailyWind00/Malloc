@@ -568,6 +568,10 @@ static void test_show_alloc_mem(void)
         return;
     }
 
+
+	memset(a, 0xAA, 42);	
+	show_alloc_mem_ex();
+
     show_alloc_mem();
     free(a);
 	show_alloc_mem();
