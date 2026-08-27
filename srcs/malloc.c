@@ -15,6 +15,13 @@ void	free(void *ptr)
 		pthread_mutex_unlock(&g_malloc_mutex);
 		return;
 	}
+	if (g_zones->debug) {
+		print_str("Freeing chunk at: ");
+		print_hex((size_t)chunk);
+		print_str(" of size: ");
+		print_nbr(chunk->size);
+		print_str("\n");
+	}
 
 	chunk->is_free = true;
 	coalesce_chunk(chunk);
@@ -106,6 +113,14 @@ void	*malloc(size_t size)
 
 			void *ptr = (char *)chunk + sizeof(Chunk);
 
+			if (g_zones->debug) {
+				print_str("Allocated chunk at: ");
+				print_hex((size_t)chunk);
+				print_str(" of size: ");
+				print_nbr(chunk->size);
+				print_str(" in zone TINY.\n");
+			}
+
 			pthread_mutex_unlock(&g_malloc_mutex);
 			return ptr;
 		}
@@ -119,6 +134,14 @@ void	*malloc(size_t size)
 			chunk->is_free = false;
 
 			void *ptr = (char *)chunk + sizeof(Chunk);
+
+			if (g_zones->debug) {
+				print_str("Allocated chunk at: ");
+				print_hex((size_t)chunk);
+				print_str(" of size: ");
+				print_nbr(chunk->size);
+				print_str(" in zone SMALL.\n");
+			}
 
 			pthread_mutex_unlock(&g_malloc_mutex);
 			return ptr;
@@ -143,6 +166,14 @@ void	*malloc(size_t size)
 			g_zones->large = chunk;
 
 		void *ptr = (char *)map + sizeof(Chunk);
+
+		if (g_zones->debug) {
+			print_str("Allocated chunk at: ");
+			print_hex((size_t)chunk);
+			print_str(" of size: ");
+			print_nbr(chunk->size);
+			print_str(" in zone LARGE.\n");
+		}
 
 		pthread_mutex_unlock(&g_malloc_mutex);
 		return ptr;
@@ -185,6 +216,15 @@ void	*realloc(void *ptr, size_t size)
 	}
 	if (size < chunk->size) {
 		try_split_chunk(chunk, size);
+
+		if (g_zones->debug) {
+			print_str("Reallocated chunk at: ");
+			print_hex((size_t)chunk);
+			print_str(" to smaller size: ");
+			print_nbr(chunk->size);
+			print_str("\n");
+		}
+
 		pthread_mutex_unlock(&g_malloc_mutex);
 		return ptr;
 	}
@@ -195,8 +235,17 @@ void	*realloc(void *ptr, size_t size)
 
 	pthread_mutex_lock(&g_malloc_mutex);
 	new_ptr = ft_memcpy(new_ptr, ptr, chunk->size);
-	pthread_mutex_unlock(&g_malloc_mutex);
 
+	if (g_zones->debug) {
+		print_str("Moved ");
+		print_nbr(chunk->size);
+		print_str(" bytes from chunk at: ");
+		print_hex((size_t)chunk + sizeof(Chunk));
+		print_str(" to: ");
+		print_hex((size_t)new_ptr);
+		print_str("\n");
+	}
+	pthread_mutex_unlock(&g_malloc_mutex);
 	free(ptr);
 	return new_ptr;
 }

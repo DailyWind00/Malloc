@@ -7,47 +7,6 @@
 static int g_tests = 0;
 static int g_failed = 0;
 
-static void	print_str(const char *str)
-{
-	size_t len = 0;
-
-	if (!str)
-		return;
-
-	while (str[len])
-		len++;
-
-	write(STDOUT_FILENO, str, len);
-}
-
-static void	print_nbr(int n)
-{
-	char	buffer[12];
-	int		i;
-	long	nb;
-
-	i = 0;
-	nb = n;
-
-	if (nb == 0) {
-		write(STDOUT_FILENO, "0", 1);
-		return;
-	}
-
-	if (nb < 0) {
-		write(STDOUT_FILENO, "-", 1);
-		nb = -nb;
-	}
-
-	while (nb > 0) {
-		buffer[i++] = '0' + (nb % 10);
-		nb /= 10;
-	}
-
-	while (i > 0)
-		write(STDOUT_FILENO, &buffer[--i], 1);
-}
-
 static void	test_start(const char *name)
 {
 	print_str("\n[TEST] ");

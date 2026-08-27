@@ -7,6 +7,7 @@
 # include <pthread.h>
 # include <unistd.h>
 # include <stdint.h>
+# include <stdlib.h>
 
 # define MIN_ALLOC_SIZE sizeof(char)
 # define TINY_MAX_SIZE 1
@@ -28,6 +29,7 @@ typedef struct Zone {
 	Chunk	*large;
 
 	size_t	page_size;
+	bool	debug;
 } Zone;
 
 extern Zone	*g_zones;
@@ -54,4 +56,7 @@ void	*ft_memcpy(void *dest, const void *src, size_t size);
 void	coalesce_chunk(Chunk *chunk);
 
 // print_memory.c
+void	print_str(const char *str);
+void	print_hex(size_t num);
+void 	print_nbr(size_t num);
 void	show_alloc_mem();

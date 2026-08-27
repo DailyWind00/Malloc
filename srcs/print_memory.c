@@ -1,12 +1,12 @@
 #include "ft_malloc.h"
 
-static void print_str(const char *str)
+void print_str(const char *str)
 {
 	while (*str)
 		write(1, str++, 1);
 }
 
-static void print_hex(size_t num)
+void print_hex(size_t num)
 {
 	char hex[17] = "0123456789ABCDEF";
 	char buffer[17];
@@ -26,7 +26,7 @@ static void print_hex(size_t num)
 		write(1, &buffer[i], 1);
 }
 
-static void print_nbr(size_t num)
+void print_nbr(size_t num)
 {
 	char buffer[21];
 	int i = 0;

@@ -88,6 +88,9 @@ void	init_malloc()
 
 	g_zones->large = NULL;
 	g_zones->page_size = psize;
+
+	const char *debug = getenv("MALLOC_DEBUG");
+	g_zones->debug = (debug && debug[0] == '1');
 }
 
 
